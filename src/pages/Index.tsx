@@ -1,15 +1,24 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, { useState, useEffect } from 'react';
-import CodeEditor from '@/components/CodeEditor';
-import FlowchartDisplay from '@/components/FlowchartDisplay';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { generateFlowchart } from '@/services/api';
-import { Code2, Github, Key } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import React, { useState, useEffect } from "react";
+import CodeEditor from "@/components/CodeEditor";
+import FlowchartDisplay from "@/components/FlowchartDisplay";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { generateFlowchart } from "@/services/api";
+import { Code2, Github, Key } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 // Define a custom FlowChart icon since it doesn't exist in lucide-react
 const FlowChart = function FlowChart(props: any) {
@@ -60,20 +69,20 @@ const Index = () => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [plantUmlCode, setPlantUmlCode] = useState<string | null>(null);
-  const [apiKey, setApiKey] = useState<string>('');
+  const [apiKey, setApiKey] = useState<string>("");
   const [isOpenDialog, setIsOpenDialog] = useState(false);
   const { toast } = useToast();
 
   // Load API key from localStorage on component mount
   useEffect(() => {
-    const savedApiKey = localStorage.getItem('openai_api_key');
+    const savedApiKey = localStorage.getItem("openai_api_key");
     if (savedApiKey) {
       setApiKey(savedApiKey);
     }
   }, []);
 
   const handleSaveApiKey = () => {
-    localStorage.setItem('openai_api_key', apiKey);
+    localStorage.setItem("openai_api_key", apiKey);
     setIsOpenDialog(false);
     toast({
       title: "API Key Saved",
@@ -91,7 +100,7 @@ const Index = () => {
       return;
     }
 
-    const savedApiKey = localStorage.getItem('openai_api_key');
+    const savedApiKey = localStorage.getItem("openai_api_key");
     if (!savedApiKey) {
       setIsOpenDialog(true);
       return;
@@ -99,7 +108,7 @@ const Index = () => {
 
     setLoading(true);
     setError(null);
-    
+
     try {
       const result = await generateFlowchart(code);
       setImageUrl(result.imageUrl);
@@ -109,10 +118,13 @@ const Index = () => {
         description: "Your flowchart has been successfully created.",
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate flowchart');
+      setError(
+        err instanceof Error ? err.message : "Failed to generate flowchart"
+      );
       toast({
         title: "Error",
-        description: err instanceof Error ? err.message : 'Failed to generate flowchart',
+        description:
+          err instanceof Error ? err.message : "Failed to generate flowchart",
         variant: "destructive",
       });
     } finally {
@@ -125,7 +137,9 @@ const Index = () => {
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <FlowChart className="h-8 w-8 text-cppblue-600" />
-          <h1 className="text-2xl font-bold text-cppblue-800">C++ Flow Magic</h1>
+          <h1 className="text-2xl font-bold text-cppblue-800">
+            C++ Flow Magic
+          </h1>
         </div>
         <div className="flex items-center gap-4">
           <Dialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
@@ -139,7 +153,8 @@ const Index = () => {
               <DialogHeader>
                 <DialogTitle>OpenAI API Key</DialogTitle>
                 <DialogDescription>
-                  Enter your OpenAI API key to generate accurate flowcharts from your C++ code.
+                  Enter your OpenAI API key to generate accurate flowcharts from
+                  your C++ code.
                 </DialogDescription>
               </DialogHeader>
               <div className="flex flex-col gap-4 py-4">
@@ -150,11 +165,16 @@ const Index = () => {
                   onChange={(e) => setApiKey(e.target.value)}
                 />
                 <p className="text-sm text-muted-foreground">
-                  Your API key is stored locally in your browser and never sent to our servers.
+                  Your API key is stored locally in your browser and never sent
+                  to our servers.
                 </p>
               </div>
               <DialogFooter>
-                <Button type="submit" onClick={handleSaveApiKey} disabled={!apiKey}>
+                <Button
+                  type="submit"
+                  onClick={handleSaveApiKey}
+                  disabled={!apiKey}
+                >
                   Save Key
                 </Button>
               </DialogFooter>
@@ -207,7 +227,11 @@ const Index = () => {
               </div>
               <div className="h-[calc(100vh-295px)]">
                 <TabsContent value="visual" className="h-full mt-0 p-4">
-                  <FlowchartDisplay imageUrl={imageUrl} loading={loading} error={error} />
+                  <FlowchartDisplay
+                    imageUrl={imageUrl}
+                    loading={loading}
+                    error={error}
+                  />
                 </TabsContent>
                 <TabsContent value="plantuml" className="h-full mt-0 p-4">
                   {plantUmlCode ? (
@@ -216,7 +240,9 @@ const Index = () => {
                     </div>
                   ) : (
                     <div className="flex h-full w-full items-center justify-center">
-                      <p className="text-muted-foreground">Generate a flowchart to see the PlantUML code</p>
+                      <p className="text-muted-foreground">
+                        Generate a flowchart to see the PlantUML code
+                      </p>
                     </div>
                   )}
                 </TabsContent>
@@ -227,7 +253,10 @@ const Index = () => {
       </main>
 
       <footer className="text-center text-sm text-muted-foreground">
-        <p>Built with React, TypeScript, and OpenAI. Flowcharts powered by PlantUML.</p>
+        <p>
+          Built with React, TypeScript, and OpenAI. Flowcharts powered by
+          PlantUML.
+        </p>
       </footer>
     </div>
   );
