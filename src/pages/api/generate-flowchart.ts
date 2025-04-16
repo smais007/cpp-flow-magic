@@ -4,16 +4,12 @@
 
 // For encoding PlantUML diagrams
 function encodePlantUml(plantUmlCode: string): string {
-  // Use a proper encoding method - this is a more reliable approach than simple btoa
-  // PlantUML expects a deflate compression followed by base64 encoding
-  // Since we're limited in browser environment without zlib, we'll use a simplified approach
-  // that works for basic diagrams
-  
-  // For production, you would use a proper deflate+base64 encoding
-  // This is a simplified version that works for basic PlantUML diagrams
+  // PlantUML online server accepts simple Base64 encoding for basic diagrams
+  // This is the most reliable approach for browser environments
   return btoa(unescape(encodeURIComponent(plantUmlCode)))
     .replace(/\+/g, '-')
-    .replace(/\//g, '_');
+    .replace(/\//g, '_')
+    .replace(/=/g, '');
 }
 
 interface FlowchartResult {
@@ -35,10 +31,10 @@ endif
 stop
 @enduml`;
   
-  // Create PlantUML image URL with the proper prefix for HUFFMAN encoding
+  // Create PlantUML image URL using the public PlantUML server
   const encoded = encodePlantUml(plantUmlCode);
-  // Add the ~h prefix for proper deflate compression format that PlantUML expects
-  const imageUrl = `https://www.plantuml.com/plantuml/png/~h${encoded}`;
+  // Use the standard PlantUML server format
+  const imageUrl = `https://www.plantuml.com/plantuml/png/${encoded}`;
   
   console.log('Generated PlantUML URL:', imageUrl);
   
