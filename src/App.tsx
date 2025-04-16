@@ -7,6 +7,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
+// Import our API mock for development
+import "./pages/api/generate-flowchart.js";
+
 const queryClient = new QueryClient();
 
 const App = () => (
