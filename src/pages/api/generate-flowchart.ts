@@ -1,11 +1,10 @@
 
-// This is a client-side mock implementation that would normally be a server endpoint
-// In a real application, this would be implemented on the server side
+// This is a client-side implementation that calls OpenAI API to generate flowcharts
+// In a production environment, this would ideally be implemented server-side
 
 // For encoding PlantUML diagrams
 function encodePlantUml(plantUmlCode: string): string {
   // PlantUML online server accepts simple Base64 encoding for basic diagrams
-  // This is the most reliable approach for browser environments
   return btoa(unescape(encodeURIComponent(plantUmlCode)))
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
@@ -17,6 +16,80 @@ interface FlowchartResult {
   imageUrl: string;
 }
 
+interface OpenAIResponse {
+  choices: {
+    message: {
+      content: string;
+    };
+  }[];
+}
+
+export async function generateFlowchartWithOpenAI(cppCode: string, apiKey: string): Promise<FlowchartResult> {
+  try {
+    // Create prompt for OpenAI
+    const prompt = `
+Convert the following C++ code into a PlantUML flowchart representation.
+Return ONLY the PlantUML code without any explanations or markdown formatting.
+The flowchart should accurately represent the control flow of the program.
+Start your response with @startuml and end with @enduml.
+
+Here is the C++ code to convert:
+
+${cppCode}`;
+
+    // Call OpenAI API
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert programmer who converts C++ code to PlantUML flowcharts. Return ONLY the PlantUML code.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.3,
+        max_tokens: 1500
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('OpenAI API error:', errorData);
+      throw new Error(errorData.error?.message || 'Failed to generate flowchart with OpenAI');
+    }
+
+    const data: OpenAIResponse = await response.json();
+    
+    // Extract PlantUML code from response
+    const plantUmlCode = data.choices[0].message.content.trim();
+    
+    // Create PlantUML image URL using the public PlantUML server
+    const encoded = encodePlantUml(plantUmlCode);
+    const imageUrl = `https://www.plantuml.com/plantuml/png/${encoded}`;
+    
+    console.log('Generated PlantUML URL:', imageUrl);
+    console.log('PlantUML code:', plantUmlCode);
+    
+    return {
+      plantUmlCode,
+      imageUrl
+    };
+  } catch (error) {
+    console.error('Error generating flowchart:', error);
+    throw error;
+  }
+}
+
+// Fallback to mock implementation if API key is missing or empty
 export async function generateFlowchartMock(cppCode: string): Promise<FlowchartResult> {
   // Mock OpenAI response
   const plantUmlCode = `@startuml
@@ -49,12 +122,33 @@ stop
 if (typeof window !== 'undefined') {
   (window as any).mockGenerateFlowchart = async (request: Request) => {
     const body = await request.json();
-    const result = await generateFlowchartMock(body.code);
-    
-    return new Response(JSON.stringify(result), {
-      headers: { 'Content-Type': 'application/json' },
-      status: 200
-    });
+
+    try {
+      // Check localStorage for API key
+      const apiKey = localStorage.getItem('openai_api_key');
+
+      let result;
+      if (apiKey) {
+        // Use OpenAI API if key is available
+        result = await generateFlowchartWithOpenAI(body.code, apiKey);
+      } else {
+        // Fall back to mock if no API key
+        result = await generateFlowchartMock(body.code);
+      }
+      
+      return new Response(JSON.stringify(result), {
+        headers: { 'Content-Type': 'application/json' },
+        status: 200
+      });
+    } catch (error) {
+      console.error('Error generating flowchart:', error);
+      return new Response(JSON.stringify({ 
+        error: error instanceof Error ? error.message : 'Unknown error occurred' 
+      }), {
+        headers: { 'Content-Type': 'application/json' },
+        status: 500
+      });
+    }
   };
   
   // Mock fetch for local development
