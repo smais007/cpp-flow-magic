@@ -8,7 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
 // Import our API mock for development
-import "./pages/api/generate-flowchart.js";
+import "./pages/api/generate-flowchart.ts";
 
 const queryClient = new QueryClient();
 

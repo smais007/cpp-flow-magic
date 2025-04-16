@@ -5,11 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { generateFlowchart } from '@/services/api';
-import { Code2, FlowChartIcon, Github } from 'lucide-react';
+import { Code2, Github } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 // Define a custom FlowChart icon since it doesn't exist in lucide-react
-const FlowChart = FlowChartIcon || function FlowChart(props: any) {
+const FlowChart = function FlowChart(props: any) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
