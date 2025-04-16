@@ -27,9 +27,10 @@ endif
 stop
 @enduml`;
   
-  // Create PlantUML image URL
+  // Create PlantUML image URL with the proper prefix for HUFFMAN encoding
   const encoded = encodePlantUml(plantUmlCode);
-  const imageUrl = `https://www.plantuml.com/plantuml/png/${encoded}`;
+  // Add the ~1 prefix to the encoded data as required by PlantUML for HUFFMAN encoding
+  const imageUrl = `https://www.plantuml.com/plantuml/png/~1${encoded}`;
   
   return {
     plantUmlCode,
