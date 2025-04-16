@@ -1,8 +1,6 @@
 /* eslint-disable prefer-rest-params */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-// This is a client-side implementation that calls OpenAI API to generate flowcharts
-// In a production environment, this would ideally be implemented server-side
 import plantumlEncoder from "plantuml-encoder";
 // For encoding PlantUML diagrams
 function encodePlantUml(plantUmlCode: string): string {
