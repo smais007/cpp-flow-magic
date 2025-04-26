@@ -1,7 +1,6 @@
-
-import React from 'react';
-import CodeMirror from '@uiw/react-codemirror';
-import { cpp } from '@codemirror/lang-cpp';
+import React from "react";
+import CodeMirror from "@uiw/react-codemirror";
+import { cpp } from "@codemirror/lang-cpp";
 
 interface CodeEditorProps {
   code: string;
@@ -9,9 +8,12 @@ interface CodeEditorProps {
 }
 
 const CodeEditor: React.FC<CodeEditorProps> = ({ code, setCode }) => {
-  const onChange = React.useCallback((value: string) => {
-    setCode(value);
-  }, [setCode]);
+  const onChange = React.useCallback(
+    (value: string) => {
+      setCode(value);
+    },
+    [setCode]
+  );
 
   return (
     <div className="h-full w-full overflow-hidden rounded-md border border-border bg-white">

@@ -5,10 +5,6 @@ import plantumlEncoder from "plantuml-encoder";
 // For encoding PlantUML diagrams
 function encodePlantUml(plantUmlCode: string): string {
   // PlantUML online server accepts simple Base64 encoding for basic diagrams
-  // return btoa(unescape(encodeURIComponent(plantUmlCode)))
-  //   .replace(/\+/g, "-")
-  //   .replace(/\//g, "_")
-  //   .replace(/=/g, "");
   return plantumlEncoder.encode(plantUmlCode);
 }
 
