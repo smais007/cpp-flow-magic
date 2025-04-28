@@ -154,21 +154,19 @@ const Index = () => {
             C++ Flow Magic
           </h1>
         </div>
-        <div>
-          <p className="text-sm text-muted-foreground">
-            Remaining: {remaingFlowcharts} / {MAX_FLOWCHARTS_PER_DAY}
-          </p>
-        </div>
+
         <div className="flex items-center gap-4">
-          <a
-            href="https://github.com/yourusername/cpp-flow-magic"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-          >
-            <Github size={16} />
-            <span>GitHub</span>
-          </a>
+          <Button asChild>
+            <a
+              href="https://github.com/smais007/cpp-flow-magic"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+            >
+              <Github size={16} />
+              <span>GitHub</span>
+            </a>
+          </Button>
         </div>
       </header>
 
@@ -178,6 +176,11 @@ const Index = () => {
             <div className="flex items-center gap-2">
               <Code2 className="h-5 w-5 text-cppblue-500" />
               <h2 className="font-medium">C++ Code</h2>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">
+                Remaining: {remaingFlowcharts} / {MAX_FLOWCHARTS_PER_DAY}
+              </p>
             </div>
             {remaingFlowcharts === 0 ? (
               <Button disabled> You have reached the limit</Button>
@@ -239,8 +242,15 @@ const Index = () => {
 
       <footer className="text-center text-sm text-muted-foreground">
         <p>
-          Built with React, TypeScript, and OpenAI. Flowcharts powered by
-          PlantUML.
+          Developed by{" "}
+          <a
+            href="https://github.com/smais007"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-cppblue-600"
+          >
+            Shawon
+          </a>
         </p>
       </footer>
     </div>
