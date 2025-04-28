@@ -7,18 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { generateFlowchart } from "@/services/api";
-import { Code2, Github, Key } from "lucide-react";
+import { Code2, Github } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
 // Define a custom FlowChart icon since it doesn't exist in lucide-react
 const FlowChart = function FlowChart(props: any) {
@@ -69,26 +59,7 @@ const Index = () => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [plantUmlCode, setPlantUmlCode] = useState<string | null>(null);
-  const [apiKey, setApiKey] = useState<string>("");
-  const [isOpenDialog, setIsOpenDialog] = useState(false);
   const { toast } = useToast();
-
-  // Load API key from localStorage on component mount
-  useEffect(() => {
-    const savedApiKey = localStorage.getItem("openai_api_key");
-    if (savedApiKey) {
-      setApiKey(savedApiKey);
-    }
-  }, []);
-
-  const handleSaveApiKey = () => {
-    localStorage.setItem("openai_api_key", apiKey);
-    setIsOpenDialog(false);
-    toast({
-      title: "API Key Saved",
-      description: "Your OpenAI API key has been saved.",
-    });
-  };
 
   const handleGenerateFlowchart = async () => {
     if (!code.trim()) {
@@ -97,12 +68,6 @@ const Index = () => {
         description: "Please enter some C++ code first.",
         variant: "destructive",
       });
-      return;
-    }
-
-    const savedApiKey = localStorage.getItem("openai_api_key");
-    if (!savedApiKey) {
-      setIsOpenDialog(true);
       return;
     }
 
@@ -142,44 +107,6 @@ const Index = () => {
           </h1>
         </div>
         <div className="flex items-center gap-4">
-          <Dialog open={isOpenDialog} onOpenChange={setIsOpenDialog}>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-2">
-                <Key size={16} />
-                <span>API Key</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>OpenAI API Key</DialogTitle>
-                <DialogDescription>
-                  Enter your OpenAI API key to generate accurate flowcharts from
-                  your C++ code.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="flex flex-col gap-4 py-4">
-                <Input
-                  type="password"
-                  placeholder="sk-..."
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                />
-                <p className="text-sm text-muted-foreground">
-                  Your API key is stored locally in your browser and never sent
-                  to our servers.
-                </p>
-              </div>
-              <DialogFooter>
-                <Button
-                  type="submit"
-                  onClick={handleSaveApiKey}
-                  disabled={!apiKey}
-                >
-                  Save Key
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
           <a
             href="https://github.com/yourusername/cpp-flow-magic"
             target="_blank"
