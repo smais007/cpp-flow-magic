@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { generateFlowchart } from "@/services/api";
 import { Code2, Github } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { set } from "date-fns";
 
 // Define a custom FlowChart icon since it doesn't exist in lucide-react
 const FlowChart = function FlowChart(props: any) {
@@ -53,6 +54,8 @@ int main() {
     return 0;
 }`;
 
+const MAX_FLOWCHARTS_PER_DAY = 5;
+
 const Index = () => {
   const [code, setCode] = useState(exampleCode);
   const [loading, setLoading] = useState(false);
@@ -60,6 +63,34 @@ const Index = () => {
   const [error, setError] = useState<string | null>(null);
   const [plantUmlCode, setPlantUmlCode] = useState<string | null>(null);
   const { toast } = useToast();
+  const [remaingFlowcharts, setRemainingFlowcharts] = useState(
+    MAX_FLOWCHARTS_PER_DAY
+  );
+
+  useEffect(() => {
+    const storeData = JSON.parse(
+      localStorage.getItem("flowcharts_usage") || "{}"
+    );
+    const now = Date.now();
+
+    if (
+      storeData.lastRestTime &&
+      now - storeData.lastRestTime < 24 * 60 * 60 * 1000
+    ) {
+      setRemainingFlowcharts(
+        Math.max(0, MAX_FLOWCHARTS_PER_DAY - storeData.flowchartGenerated)
+      );
+    } else {
+      localStorage.setItem(
+        "flowcharts_usage",
+        JSON.stringify({
+          flowchartGenerated: 0,
+          lastRestTime: now,
+        })
+      );
+      setRemainingFlowcharts(MAX_FLOWCHARTS_PER_DAY);
+    }
+  }, []);
 
   const handleGenerateFlowchart = async () => {
     if (!code.trim()) {
@@ -78,6 +109,23 @@ const Index = () => {
       const result = await generateFlowchart(code);
       setImageUrl(result.imageUrl);
       setPlantUmlCode(result.plantUmlCode);
+
+      const storedData = JSON.parse(
+        localStorage.getItem("flowcharts_usage") || "{}"
+      );
+
+      const newCount = (storedData.flowchartGenerated || 0) + 1;
+
+      localStorage.setItem(
+        "flowcharts_usage",
+        JSON.stringify({
+          flowchartGenerated: newCount,
+          lastResetTime: storedData.lastResetTime || Date.now(),
+        })
+      );
+
+      setRemainingFlowcharts(Math.max(0, MAX_FLOWCHARTS_PER_DAY - newCount));
+
       toast({
         title: "Flowchart generated",
         description: "Your flowchart has been successfully created.",
@@ -106,6 +154,11 @@ const Index = () => {
             C++ Flow Magic
           </h1>
         </div>
+        <div>
+          <p className="text-sm text-muted-foreground">
+            Remaining: {remaingFlowcharts} / {MAX_FLOWCHARTS_PER_DAY}
+          </p>
+        </div>
         <div className="flex items-center gap-4">
           <a
             href="https://github.com/yourusername/cpp-flow-magic"
@@ -126,9 +179,13 @@ const Index = () => {
               <Code2 className="h-5 w-5 text-cppblue-500" />
               <h2 className="font-medium">C++ Code</h2>
             </div>
-            <Button onClick={handleGenerateFlowchart} disabled={loading}>
-              {loading ? "Generating..." : "Generate Flowchart"}
-            </Button>
+            {remaingFlowcharts === 0 ? (
+              <Button disabled> You have reached the limit</Button>
+            ) : (
+              <Button onClick={handleGenerateFlowchart} disabled={loading}>
+                {loading ? "Generating..." : "Generate Flowchart"}
+              </Button>
+            )}
           </div>
           <CardContent className="flex-1 p-0">
             <div className="h-[calc(100vh-250px)]">
@@ -141,6 +198,7 @@ const Index = () => {
           <div className="flex items-center justify-between border-b border-border p-4">
             <div className="flex items-center gap-2">
               <FlowChart className="h-5 w-5 text-cppblue-500" />
+
               <h2 className="font-medium">Generated Flowchart</h2>
             </div>
           </div>
