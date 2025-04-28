@@ -21,6 +21,8 @@ interface OpenAIResponse {
   }[];
 }
 
+const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+
 export async function generateFlowchartWithOpenAI(
   cppCode: string,
   apiKey: string
@@ -42,7 +44,7 @@ ${cppCode}`;
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
@@ -130,8 +132,7 @@ if (typeof window !== "undefined") {
     const body = await request.json();
 
     try {
-      // Check localStorage for API key
-      const apiKey = localStorage.getItem("openai_api_key");
+      console.log("API Key:", apiKey);
 
       let result;
       if (apiKey) {
